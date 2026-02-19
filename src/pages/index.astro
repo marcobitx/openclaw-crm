@@ -1,0 +1,9 @@
+---
+// src/pages/index.astro
+// Entry point — mounts the React App shell client-only
+import Layout from '../layouts/Layout.astro';
+import App from '../components/App';
+---
+<Layout title="OpenClaw CRM">
+  <App client:only="react" />
+</Layout>
