@@ -58,6 +58,14 @@ export default function App() {
     }
   };
 
+  // Fetch gateway status on load
+  useEffect(() => {
+    fetch('/api/status')
+      .then(r => r.json())
+      .then(data => appStore.setState({ status: data }))
+      .catch(() => appStore.setState({ status: { online: false, version: 'unknown', port: 18789, model: 'unknown' } }));
+  }, []);
+
   // Global keyboard shortcuts
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
@@ -91,7 +99,7 @@ export default function App() {
 
         <div className="flex-1 flex overflow-hidden min-h-0">
           <main className="flex-1 overflow-y-auto scrollbar-thin">
-            <div className="px-4 py-4 sm:px-6 sm:py-6 md:px-8 md:py-6 animate-fade-in">
+            <div key={state.view} className="px-4 py-4 sm:px-6 sm:py-6 md:px-8 md:py-6 view-enter">
               {renderView()}
             </div>
           </main>

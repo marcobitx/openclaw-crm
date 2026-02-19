@@ -207,6 +207,65 @@
     @apply bg-surface-800/60 rounded-lg animate-pulse;
   }
 
+  /* ── View Transition ────────────────────────────────────────── */
+
+  .view-enter {
+    animation: viewEnter 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes viewEnter {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* ── Shimmer Text ──────────────────────────────────────────── */
+
+  .shimmer-text {
+    background: linear-gradient(
+      90deg,
+      #818cf8 0%,
+      #818cf8 35%,
+      #ffffff 50%,
+      #818cf8 65%,
+      #818cf8 100%
+    );
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmerText 1.4s ease-in-out infinite;
+  }
+
+  @keyframes shimmerText {
+    0% { background-position: 100% 0; }
+    100% { background-position: -100% 0; }
+  }
+
+  /* ── Breathing Ring (active indicators) ────────────────────── */
+
+  .breathing-ring {
+    position: relative;
+  }
+  .breathing-ring::before {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: inherit;
+    border: 1.5px solid rgba(99, 102, 241, 0.25);
+    animation: breathe 2s ease-in-out infinite;
+  }
+
+  @keyframes breathe {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.03); }
+  }
+
   /* ── Status Indicator ──────────────────────────────────────── */
 
   .status-dot {
