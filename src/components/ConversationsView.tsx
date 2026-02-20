@@ -76,6 +76,20 @@ function formatTokens(n: number): string {
   return n.toString();
 }
 
+// Marco's Discord user ID — always show as "marcobit"
+const MARCO_DISCORD_ID = '1471565107174707284';
+const MARCO_NAME = 'marcobit';
+
+// Normalize author — resolve Marco's identity
+function resolveAuthor(author: Message['author']): Message['author'] {
+  if (!author) return { id: 'unknown', username: 'Unknown', displayName: 'Unknown', bot: false };
+  // If it's Marco's Discord ID
+  if (author.id === MARCO_DISCORD_ID) {
+    return { ...author, username: MARCO_NAME, displayName: MARCO_NAME, bot: false };
+  }
+  return author;
+}
+
 // Simple color from username
 function userColor(name: string): string {
   const colors = ['text-blue-400', 'text-green-400', 'text-purple-400', 'text-pink-400', 'text-yellow-400', 'text-cyan-400', 'text-orange-400', 'text-red-400'];
@@ -123,16 +137,26 @@ export default function ConversationsView() {
 
   // Load messages when channel changes
   const loadMessages = useCallback(async (channelId: string) => {
-    if (channelId === 'main') return; // TUI doesn't support message reading
     setLoadingMessages(true);
     setError(null);
     try {
-      const res = await fetch(`/api/channels/messages?channelId=${channelId}&limit=50`);
-      const data = await res.json();
-      if (data.error) {
-        setError(data.error);
-        setMessages([]);
+      let data: any[];
+      if (channelId === 'main') {
+        // TUI: read from transcript file
+        const res = await fetch('/api/channels/tui-history?limit=50');
+        data = await res.json();
+        if (!Array.isArray(data)) data = [];
+        // Transcript is already in chronological order
+        setMessages(data);
       } else {
+        // Discord: read via message tool
+        const res = await fetch(`/api/channels/messages?channelId=${channelId}&limit=50`);
+        data = await res.json();
+        if (data.error) {
+          setError(data.error);
+          setMessages([]);
+          return;
+        }
         const msgs = Array.isArray(data) ? data : [];
         // Reverse to show oldest first (Discord returns newest first)
         setMessages(msgs.reverse());
@@ -211,10 +235,10 @@ export default function ConversationsView() {
     setSlashSuggestions([]);
     setSending(true);
 
-    // Add local "you" message immediately
+    // Add local "you" message immediately — always as marcobit
     const localMsg: Message = {
       id: `local-${Date.now()}`,
-      author: { id: 'you', username: 'marcobit', displayName: 'marcobit', bot: false },
+      author: { id: MARCO_DISCORD_ID, username: MARCO_NAME, displayName: MARCO_NAME, bot: false },
       content: text,
       timestamp: new Date().toISOString(),
     };
@@ -400,29 +424,34 @@ export default function ConversationsView() {
                     </button>
                   </div>
                 </div>
-              ) : selectedChannel.id === 'main' ? (
-                <div className="flex items-center justify-center h-full">
-                  <div className="text-center">
-                    <TerminalIcon className="w-12 h-12 text-surface-700 mx-auto mb-3" />
-                    <p className="text-[14px] text-surface-400">TUI Session</p>
-                    <p className="text-[12px] text-surface-500 mt-1">Terminal sessions don't support message reading</p>
-                  </div>
-                </div>
               ) : messages.length === 0 ? (
                 <div className="flex items-center justify-center h-full">
                   <div className="text-center">
-                    <HashIcon className="w-12 h-12 text-surface-700 mx-auto mb-3" />
-                    <p className="text-[14px] text-surface-400">No messages in #{selectedChannel.name}</p>
-                    <p className="text-[12px] text-surface-500 mt-1">Start a conversation below</p>
+                    {selectedChannel.id === 'main' ? (
+                      <>
+                        <TerminalIcon className="w-12 h-12 text-surface-700 mx-auto mb-3" />
+                        <p className="text-[14px] text-surface-400">Terminal Session</p>
+                        <p className="text-[12px] text-surface-500 mt-1">No transcript found. Start chatting via TUI first.</p>
+                      </>
+                    ) : (
+                      <>
+                        <HashIcon className="w-12 h-12 text-surface-700 mx-auto mb-3" />
+                        <p className="text-[14px] text-surface-400">No messages in #{selectedChannel.name}</p>
+                        <p className="text-[12px] text-surface-500 mt-1">Start a conversation below</p>
+                      </>
+                    )}
                   </div>
                 </div>
               ) : (
                 <div className="space-y-1">
                   {[...messages, ...localMessages].map((msg, idx, all) => {
                     const prev = all[idx - 1];
-                    const sameAuthor = prev?.author?.id === msg.author?.id;
-                    const authorName = msg.author?.displayName || msg.author?.username || 'Unknown';
-                    const isBot = msg.author?.bot;
+                    const author = resolveAuthor(msg.author);
+                    const prevAuthor = prev ? resolveAuthor(prev.author) : null;
+                    const sameAuthor = prevAuthor?.id === author?.id;
+                    const authorName = author?.displayName || author?.username || 'Unknown';
+                    const isBot = author?.bot;
+                    const isMarco = author?.id === MARCO_DISCORD_ID || author?.username === MARCO_NAME;
 
                     return (
                       <div key={msg.id} className={clsx('group', !sameAuthor && idx > 0 && 'mt-4')}>
@@ -431,9 +460,10 @@ export default function ConversationsView() {
                             {/* Avatar */}
                             <div className={clsx(
                               'w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-[13px] font-bold',
+                              isMarco ? 'bg-accent-500/20 text-accent-400' :
                               isBot ? 'bg-brand-500/20 text-brand-400' : 'bg-surface-700/50 text-surface-300'
                             )}>
-                              {isBot ? '🤖' : authorName[0]?.toUpperCase()}
+                              {isMarco ? '⚡' : isBot ? '🤖' : authorName[0]?.toUpperCase()}
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-baseline gap-2 mb-0.5">
@@ -491,7 +521,7 @@ export default function ConversationsView() {
             </div>
 
             {/* Input Area */}
-            {selectedChannel.type === 'discord' && (
+            {(selectedChannel.type === 'discord' || selectedChannel.id === 'main') && (
               <div className="px-4 pb-4 pt-1">
                 {/* Slash command suggestions */}
                 {slashSuggestions.length > 0 && (
