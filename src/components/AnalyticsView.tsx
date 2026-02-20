@@ -4,14 +4,18 @@
 import { useState } from 'react';
 import { clsx } from 'clsx';
 import {
-  BarChart3, TrendingUp, Coins, Clock, Cpu,
-  AreaChart as AreaChartIcon,
-} from 'lucide-react';
+  CustomAnalytics as BarChart3,
+  CustomTrendingUp as TrendingUp,
+  CustomCoins as Coins,
+  CustomClock as Clock,
+  CustomAnalytics as Cpu,
+} from './common/CustomIcons';
 import {
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from 'recharts';
 import GlassCard from './common/GlassCard';
+import { WarmGlow } from './common/VisualElements';
 
 // Mock data — shown when no analytics API is available
 const MOCK_TOKEN_USAGE = [
@@ -45,16 +49,17 @@ const MOCK_MODELS = [
   { model: 'minimax-m2.5', tokens: 10000, percentage: 2 },
 ];
 
-const PIE_COLORS = ['#6366f1', '#06b6d4', '#10b981', '#f59e0b'];
+const PIE_COLORS = ['#F43F5E', '#F59E0B', '#10B981', '#78716C'];
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload) return null;
   return (
-    <div className="glass-card p-3 text-[12px]">
-      <p className="text-surface-300 font-semibold mb-1">{label}</p>
+    <div className="glass-card p-4 text-[12px] border-brand-500/20 shadow-xl">
+      <p className="text-surface-100 font-bold mb-2">{label}</p>
       {payload.map((entry: any, i: number) => (
-        <p key={i} style={{ color: entry.color }} className="font-mono">
-          {entry.name}: {typeof entry.value === 'number' ? entry.value.toLocaleString() : entry.value}
+        <p key={i} style={{ color: entry.color }} className="font-semibold flex items-center justify-between gap-6">
+          <span>{entry.name}:</span>
+          <span className="font-mono">{typeof entry.value === 'number' ? entry.value.toLocaleString() : entry.value}</span>
         </p>
       ))}
     </div>
@@ -67,21 +72,30 @@ export default function AnalyticsView() {
   const totalSessions = MOCK_SESSIONS.reduce((sum, d) => sum + d.count, 0);
 
   const statCards = [
-    { label: 'Total Tokens', value: `${(totalTokens / 1000).toFixed(0)}K`, icon: TrendingUp, color: 'text-brand-400', bg: 'bg-brand-500/10' },
-    { label: 'Total Cost', value: `$${totalCost.toFixed(2)}`, icon: Coins, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
-    { label: 'Sessions', value: totalSessions, icon: BarChart3, color: 'text-accent-400', bg: 'bg-accent-500/10' },
-    { label: 'Avg Duration', value: '4.2m', icon: Clock, color: 'text-amber-400', bg: 'bg-amber-500/10' },
+    { label: 'Total Tokens', value: `${(totalTokens / 1000).toFixed(0)}K`, icon: TrendingUp, color: 'text-brand-400', bg: 'bg-brand-500/20' },
+    { label: 'Total Cost', value: `$${totalCost.toFixed(2)}`, icon: Coins, color: 'text-emerald-400', bg: 'bg-emerald-500/20' },
+    { label: 'Sessions', value: totalSessions, icon: BarChart3, color: 'text-accent-400', bg: 'bg-accent-500/20' },
+    { label: 'Avg Duration', value: '4.2m', icon: Clock, color: 'text-amber-400', bg: 'bg-amber-500/20' },
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
+      <WarmGlow className="-top-32 -right-32 w-[500px] h-[500px] opacity-40" />
+
       {/* Info Banner */}
-      <GlassCard padding="p-3" className="border-accent-500/20 bg-accent-500/5">
-        <div className="flex items-center gap-2">
-          <Cpu className="w-4 h-4 text-accent-400 flex-shrink-0" />
-          <p className="text-[12px] text-accent-300">
-            <strong>Sample data shown.</strong> Connect the analytics API for live usage metrics.
-          </p>
+      <GlassCard padding="p-4" className="border-accent-500/10 bg-accent-500/5 backdrop-blur-md">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-accent-500/10 flex items-center justify-center">
+            <Cpu className="w-4.5 h-4.5 text-accent-400" />
+          </div>
+          <div>
+            <p className="text-[13px] text-accent-200 font-medium">
+              Intelligence Analytics Active
+            </p>
+            <p className="text-[11px] text-accent-400/80 mt-0.5">
+              Sample data shown until Gateway API is fully synchronized.
+            </p>
+          </div>
         </div>
       </GlassCard>
 
@@ -90,122 +104,134 @@ export default function AnalyticsView() {
         {statCards.map((card, i) => {
           const Icon = card.icon;
           return (
-            <GlassCard key={card.label} className={clsx('animate-stagger', `animate-stagger-${i + 1}`)}>
-              <div className="flex items-start justify-between">
+            <GlassCard key={card.label} className={clsx('animate-stagger', `animate-stagger-${i + 1}`, 'group overflow-hidden')} hover>
+              <div className="flex items-center justify-between relative z-10">
                 <div>
-                  <p className="text-[11px] font-semibold text-surface-400 uppercase tracking-wider">{card.label}</p>
-                  <p className="text-xl font-bold text-surface-100 mt-1">{card.value}</p>
+                  <p className="text-[11px] font-bold text-surface-500 uppercase tracking-widest leading-none">{card.label}</p>
+                  <p className="text-2xl font-bold text-surface-50 mt-1.5">{card.value}</p>
                 </div>
-                <div className={clsx('p-2 rounded-xl', card.bg)}>
-                  <Icon className={clsx('w-4 h-4', card.color)} />
+                <div className={clsx(
+                  'w-11 h-11 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-md shadow-black/20',
+                  card.bg
+                )}>
+                  <Icon className={clsx('w-5 h-5', card.color)} />
                 </div>
               </div>
+              <div className={clsx('absolute -bottom-4 -right-4 w-16 h-16 blur-2xl opacity-10', card.bg)} />
             </GlassCard>
           );
         })}
       </div>
 
       {/* Charts Row 1 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Token Usage Chart */}
-        <GlassCard>
-          <h3 className="text-[14px] font-bold text-surface-100 mb-4 flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-brand-400" />
-            Token Usage
+        <GlassCard className="lg:col-span-2">
+          <h3 className="text-[15px] font-bold text-surface-100 mb-6 flex items-center gap-2">
+            <TrendingUp className="w-4.5 h-4.5 text-brand-400" />
+            Token Consumption Hub
           </h3>
-          <ResponsiveContainer width="100%" height={240}>
+          <ResponsiveContainer width="100%" height={280}>
             <AreaChart data={MOCK_TOKEN_USAGE}>
               <defs>
                 <linearGradient id="tokenGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                  <stop offset="5%" stopColor="#F43F5E" stopOpacity={0.25} />
+                  <stop offset="95%" stopColor="#F43F5E" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(51, 65, 85, 0.3)" />
-              <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} tickFormatter={(v) => `${(v / 1000).toFixed(0)}K`} />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(68, 64, 60, 0.2)" vertical={false} />
+              <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#78716c' }} axisLine={false} tickLine={false} dy={10} />
+              <YAxis tick={{ fontSize: 11, fill: '#78716c' }} axisLine={false} tickLine={false} tickFormatter={(v) => `${(v / 1000).toFixed(0)}K`} dx={-5} />
               <Tooltip content={<CustomTooltip />} />
-              <Area type="monotone" dataKey="tokens" stroke="#6366f1" fill="url(#tokenGrad)" strokeWidth={2} name="Tokens" />
+              <Area type="monotone" dataKey="tokens" stroke="#F43F5E" fill="url(#tokenGrad)" strokeWidth={3} name="Tokens" />
             </AreaChart>
           </ResponsiveContainer>
         </GlassCard>
 
-        {/* Sessions Per Day */}
-        <GlassCard>
-          <h3 className="text-[14px] font-bold text-surface-100 mb-4 flex items-center gap-2">
-            <BarChart3 className="w-4 h-4 text-accent-400" />
-            Sessions Per Day
-          </h3>
-          <ResponsiveContainer width="100%" height={240}>
-            <BarChart data={MOCK_SESSIONS}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(51, 65, 85, 0.3)" />
-              <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
-              <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey="count" fill="#06b6d4" radius={[4, 4, 0, 0]} name="Sessions" />
-            </BarChart>
-          </ResponsiveContainer>
-        </GlassCard>
-      </div>
-
-      {/* Charts Row 2 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Model Breakdown */}
         <GlassCard>
-          <h3 className="text-[14px] font-bold text-surface-100 mb-4 flex items-center gap-2">
-            <Cpu className="w-4 h-4 text-emerald-400" />
-            Model Breakdown
+          <h3 className="text-[15px] font-bold text-surface-100 mb-6 flex items-center gap-2">
+            <Cpu className="w-4.5 h-4.5 text-emerald-400" />
+            Model Utilization
           </h3>
-          <div className="flex items-center gap-6">
-            <ResponsiveContainer width={160} height={160}>
-              <PieChart>
-                <Pie
-                  data={MOCK_MODELS}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={45}
-                  outerRadius={70}
-                  dataKey="percentage"
-                  nameKey="model"
-                  stroke="none"
-                >
-                  {MOCK_MODELS.map((_, i) => (
-                    <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
-                  ))}
-                </Pie>
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="flex-1 space-y-2">
+          <div className="flex flex-col items-center gap-8 py-2">
+            <div className="relative w-full h-44">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={MOCK_MODELS}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={55}
+                    outerRadius={80}
+                    paddingAngle={4}
+                    dataKey="percentage"
+                    nameKey="model"
+                    stroke="none"
+                  >
+                    {MOCK_MODELS.map((_, i) => (
+                      <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip content={<CustomTooltip />} />
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                <span className="text-[10px] font-bold text-surface-500 uppercase">Primary</span>
+                <span className="text-lg font-bold text-surface-50 leading-none">Sonnet</span>
+              </div>
+            </div>
+            <div className="w-full space-y-3">
               {MOCK_MODELS.map((m, i) => (
-                <div key={m.model} className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: PIE_COLORS[i] }} />
-                  <span className="text-[12px] text-surface-300 flex-1 truncate">{m.model}</span>
-                  <span className="text-[12px] text-surface-400 font-mono">{m.percentage}%</span>
+                <div key={m.model} className="flex items-center gap-3 group">
+                  <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: PIE_COLORS[i] }} />
+                  <span className="text-[12px] text-surface-300 flex-1 truncate group-hover:text-surface-100 transition-colors">{m.model}</span>
+                  <span className="text-[12px] text-surface-500 font-mono">{m.percentage}%</span>
                 </div>
               ))}
             </div>
           </div>
         </GlassCard>
+      </div>
+
+      {/* Row 2 */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Sessions Per Day */}
+        <GlassCard>
+          <h3 className="text-[15px] font-bold text-surface-100 mb-6 flex items-center gap-2">
+            <BarChart3 className="w-4.5 h-4.5 text-accent-400" />
+            Engagement Velocity
+          </h3>
+          <ResponsiveContainer width="100%" height={240}>
+            <BarChart data={MOCK_SESSIONS}>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(68, 64, 60, 0.2)" vertical={false} />
+              <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#78716c' }} axisLine={false} tickLine={false} dy={10} />
+              <YAxis tick={{ fontSize: 11, fill: '#78716c' }} axisLine={false} tickLine={false} dx={-5} />
+              <Tooltip content={<CustomTooltip />} />
+              <Bar dataKey="count" fill="#F59E0B" radius={[6, 6, 0, 0]} name="Sessions" barSize={24} />
+            </BarChart>
+          </ResponsiveContainer>
+        </GlassCard>
 
         {/* Cost Breakdown */}
         <GlassCard>
-          <h3 className="text-[14px] font-bold text-surface-100 mb-4 flex items-center gap-2">
-            <Coins className="w-4 h-4 text-amber-400" />
-            Daily Cost
+          <h3 className="text-[15px] font-bold text-surface-100 mb-6 flex items-center gap-2">
+            <Coins className="w-4.5 h-4.5 text-emerald-400" />
+            Cloud Expenditures
           </h3>
-          <ResponsiveContainer width="100%" height={200}>
+          <ResponsiveContainer width="100%" height={240}>
             <AreaChart data={MOCK_TOKEN_USAGE}>
               <defs>
                 <linearGradient id="costGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.25} />
                   <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(51, 65, 85, 0.3)" />
-              <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${v}`} />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(68, 64, 60, 0.2)" vertical={false} />
+              <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#78716c' }} axisLine={false} tickLine={false} dy={10} />
+              <YAxis tick={{ fontSize: 11, fill: '#78716c' }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${v}`} dx={-5} />
               <Tooltip content={<CustomTooltip />} />
-              <Area type="monotone" dataKey="cost" stroke="#10b981" fill="url(#costGrad)" strokeWidth={2} name="Cost ($)" />
+              <Area type="monotone" dataKey="cost" stroke="#10b981" fill="url(#costGrad)" strokeWidth={3} name="Cost ($)" />
             </AreaChart>
           </ResponsiveContainer>
         </GlassCard>

@@ -3,7 +3,15 @@
 
 import { useEffect, useState } from 'react';
 import { clsx } from 'clsx';
-import { Settings, Copy, Check, ChevronRight, ChevronDown, AlertTriangle, Lock } from 'lucide-react';
+import {
+  CustomConfig,
+  CustomCopy,
+  CustomCheck,
+  CustomChevronRight,
+  CustomChevronDown,
+  CustomAlert,
+  CustomLock
+} from './common/CustomIcons';
 import GlassCard from './common/GlassCard';
 
 export default function ConfigView() {
@@ -63,7 +71,7 @@ export default function ConfigView() {
       return (
         <div>
           <button onClick={() => toggleKey(path)} className="inline-flex items-center gap-1 text-surface-400 hover:text-surface-200">
-            {isExpanded ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
+            {isExpanded ? <CustomChevronDown className="w-3 h-3" /> : <CustomChevronRight className="w-3 h-3" />}
             <span className="text-[11px] text-surface-500">[{value.length} items]</span>
           </button>
           {isExpanded && (
@@ -88,7 +96,7 @@ export default function ConfigView() {
       return (
         <div>
           <button onClick={() => toggleKey(path)} className="inline-flex items-center gap-1 text-surface-400 hover:text-surface-200">
-            {isExpanded ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
+            {isExpanded ? <CustomChevronDown className="w-3 h-3" /> : <CustomChevronRight className="w-3 h-3" />}
             <span className="text-[11px] text-surface-500">{'{'}...{'}'} {keys.length} keys</span>
           </button>
           {isExpanded && (
@@ -117,7 +125,7 @@ export default function ConfigView() {
       {/* Safety Banner */}
       <GlassCard padding="p-3" className="border-amber-500/20 bg-amber-500/5">
         <div className="flex items-center gap-2">
-          <Lock className="w-4 h-4 text-amber-400 flex-shrink-0" />
+          <CustomLock className="w-4 h-4 text-amber-400 flex-shrink-0" />
           <p className="text-[12px] text-amber-300">
             <strong>Read-only view.</strong> Config changes should be made via the OpenClaw CLI or gateway tools.
           </p>
@@ -128,18 +136,18 @@ export default function ConfigView() {
       <GlassCard padding="p-0">
         <div className="flex items-center justify-between px-4 py-3 border-b border-surface-700/20">
           <div className="flex items-center gap-2">
-            <Settings className="w-4 h-4 text-brand-400" />
+            <CustomConfig className="w-4 h-4 text-brand-400" />
             <h3 className="text-[14px] font-bold text-surface-100">Gateway Configuration</h3>
           </div>
           <button onClick={copyToClipboard} className="btn-ghost flex items-center gap-1.5">
-            {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+            {copied ? <CustomCheck className="w-3.5 h-3.5 text-emerald-400" /> : <CustomCopy className="w-3.5 h-3.5" />}
             {copied ? 'Copied' : 'Copy JSON'}
           </button>
         </div>
         <div className="p-4 overflow-x-auto scrollbar-thin max-h-[calc(100vh-16rem)]">
           {config ? renderValue(config, 'root', 0) : (
             <div className="flex items-center gap-2 text-[13px] text-surface-400">
-              <AlertTriangle className="w-4 h-4 text-amber-400" />
+              <CustomAlert className="w-4 h-4 text-amber-400" />
               Failed to load configuration
             </div>
           )}

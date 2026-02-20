@@ -4,12 +4,22 @@
 
 import { clsx } from 'clsx';
 import {
-  LayoutDashboard, MessageSquare, Clock, FolderOpen, Brain,
-  Settings, Calendar, BarChart3, HelpCircle,
-  PanelLeftClose, PanelLeftOpen, Zap,
+  PanelLeftClose, PanelLeftOpen,
 } from 'lucide-react';
 import { appStore, useStore } from '../lib/store';
+import { AnimatedLogo } from './common/VisualElements';
 import type { AppView } from '../lib/types';
+import {
+  CustomDashboard,
+  CustomConversations,
+  CustomCron,
+  CustomFiles,
+  CustomSkills,
+  CustomConfig,
+  CustomCalendar,
+  CustomAnalytics,
+  CustomHelp,
+} from './common/CustomIcons';
 
 interface Props {
   currentView: AppView;
@@ -17,14 +27,14 @@ interface Props {
 }
 
 const MAIN_NAV: { view: AppView; icon: any; label: string }[] = [
-  { view: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { view: 'conversations', icon: MessageSquare, label: 'Conversations' },
-  { view: 'cron', icon: Clock, label: 'Cron Jobs' },
-  { view: 'files', icon: FolderOpen, label: 'Files' },
-  { view: 'skills', icon: Brain, label: 'Skills' },
-  { view: 'config', icon: Settings, label: 'Config' },
-  { view: 'calendar', icon: Calendar, label: 'Calendar' },
-  { view: 'analytics', icon: BarChart3, label: 'Analytics' },
+  { view: 'dashboard', icon: CustomDashboard, label: 'Dashboard' },
+  { view: 'conversations', icon: CustomConversations, label: 'Conversations' },
+  { view: 'cron', icon: CustomCron, label: 'Cron Jobs' },
+  { view: 'files', icon: CustomFiles, label: 'Files' },
+  { view: 'skills', icon: CustomSkills, label: 'Skills' },
+  { view: 'config', icon: CustomConfig, label: 'Config' },
+  { view: 'calendar', icon: CustomCalendar, label: 'Calendar' },
+  { view: 'analytics', icon: CustomAnalytics, label: 'Analytics' },
 ];
 
 /** Reusable fade wrapper — text smoothly appears/disappears with the sidebar */
@@ -51,16 +61,15 @@ export default function IconSidebar({ currentView, onNavigate }: Props) {
   return (
     <aside
       className={clsx(
-        'flex flex-col h-full flex-shrink-0 overflow-hidden',
-        'bg-surface-950/80',
+        'flex flex-col h-full flex-shrink-0 overflow-hidden bg-transparent',
         'transition-[width] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]',
         expanded ? 'w-[240px]' : 'w-[60px]',
       )}
     >
       {/* Logo */}
       <div className="flex items-center flex-shrink-0 h-14 px-4">
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-500 flex items-center justify-center shadow-sm flex-shrink-0 transition-transform duration-300">
-          <Zap className="w-4 h-4 text-white" />
+        <div className="w-9 h-9 flex items-center justify-center flex-shrink-0 transition-transform duration-500 hover:scale-110">
+          <AnimatedLogo className="w-full h-full" />
         </div>
         <FadeText expanded={expanded}>
           <span className="flex items-center gap-2">
@@ -109,22 +118,33 @@ export default function IconSidebar({ currentView, onNavigate }: Props) {
               onClick={() => onNavigate(view)}
               title={expanded ? undefined : label}
               className={clsx(
-                'relative flex items-center w-full py-2.5 px-3 rounded-lg',
-                'transition-all duration-200 group',
+                'relative flex items-center w-full py-2.5 px-3 rounded-xl',
+                'transition-all duration-300 group',
                 active
-                  ? 'bg-surface-800/80 text-surface-100'
-                  : 'text-surface-400 hover:text-surface-200 hover:bg-surface-800/40',
+                  ? 'bg-white/[0.08] text-surface-100 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]'
+                  : 'text-surface-400 hover:text-surface-200 hover:bg-white/[0.04]',
               )}
             >
+              {/* Active Indicator Glow */}
+              <div className={clsx(
+                "absolute left-0 w-1 h-5 bg-brand-500 rounded-r-full transition-all duration-500 blur-[2px]",
+                active ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-full scale-y-0"
+              )} />
+
               <Icon
                 className={clsx(
-                  'w-[18px] h-[18px] flex-shrink-0 transition-colors duration-200',
-                  active ? 'text-brand-400' : 'text-surface-500 group-hover:text-surface-300',
+                  'w-[18px] h-[18px] flex-shrink-0 transition-all duration-300 relative z-10',
+                  active ? 'text-brand-400 drop-shadow-[0_0_8px_rgba(244,63,94,0.4)]' : 'text-surface-500 group-hover:text-surface-300',
                 )}
               />
               <FadeText expanded={expanded} className={active ? 'text-surface-100' : ''}>
-                <span className="text-[13px] font-semibold tracking-tight">{label}</span>
+                <span className="text-[13px] font-bold tracking-tight">{label}</span>
               </FadeText>
+
+              {/* Sophisticated glass highlights on active */}
+              {active && (
+                <div className="absolute inset-0 rounded-xl border border-white/[0.08] pointer-events-none" />
+              )}
             </button>
           );
         })}
@@ -138,9 +158,9 @@ export default function IconSidebar({ currentView, onNavigate }: Props) {
         <button
           onClick={() => window.open('https://docs.openclaw.dev', '_blank')}
           title={expanded ? undefined : 'Help'}
-          className="relative flex items-center w-full py-2.5 px-3 rounded-lg transition-all duration-200 text-left text-surface-400 hover:text-surface-200 hover:bg-surface-800/40 group"
+          className="relative flex items-center w-full py-2.5 px-3 rounded-lg transition-all duration-200 text-left text-surface-400 hover:text-surface-200 hover:bg-white/5 group"
         >
-          <HelpCircle className="w-[18px] h-[18px] flex-shrink-0 text-surface-500 group-hover:text-surface-300 transition-colors duration-200" />
+          <CustomHelp className="w-[18px] h-[18px] flex-shrink-0 text-surface-500 group-hover:text-surface-300 transition-colors duration-200" />
           <FadeText expanded={expanded}>
             <span className="text-[13px] font-semibold tracking-tight">Help</span>
           </FadeText>
@@ -148,10 +168,10 @@ export default function IconSidebar({ currentView, onNavigate }: Props) {
       </nav>
 
       {/* Profile */}
-      <div className="flex-shrink-0 border-t border-surface-800/60">
+      <div className="flex-shrink-0">
         <div
           className={clsx(
-            'flex items-center gap-3 transition-all duration-200 hover:bg-surface-800/50',
+            'flex items-center gap-3 transition-all duration-200 hover:bg-white/5',
             expanded ? 'px-4 py-3' : 'px-0 py-3 justify-center',
           )}
         >

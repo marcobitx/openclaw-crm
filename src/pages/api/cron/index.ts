@@ -1,60 +1,62 @@
 // src/pages/api/cron/index.ts
-// GET: List cron jobs. POST: toggle/trigger actions.
+// GET: List cron jobs via gateway tools/invoke -> cron
+// POST: toggle/trigger actions
 
 import type { APIRoute } from 'astro';
-import { gatewayJSON } from '../../../lib/gateway';
-import fs from 'node:fs/promises';
-import path from 'node:path';
+import { toolInvoke } from '../../../lib/gateway';
 
-const CRON_DIR = 'C:\\Users\\nj\\.openclaw\\cron';
-
-// Try gateway first, fallback to scanning cron directory
-async function getCronJobsFromFiles() {
-  const jobs: any[] = [];
-  try {
-    const entries = await fs.readdir(CRON_DIR, { withFileTypes: true });
-    for (const entry of entries) {
-      if (entry.isFile() && entry.name.endsWith('.json')) {
-        try {
-          const content = await fs.readFile(path.join(CRON_DIR, entry.name), 'utf-8');
-          const data = JSON.parse(content);
-          jobs.push({
-            id: data.id || entry.name.replace('.json', ''),
-            name: data.name || data.label || entry.name.replace('.json', ''),
-            schedule: data.schedule || data.cron || '* * * * *',
-            scheduleHuman: data.scheduleHuman || data.schedule || '',
-            enabled: data.enabled !== false,
-            lastRun: data.lastRun || null,
-            nextRun: data.nextRun || null,
-            payload: data.payload || data.command || null,
-            status: data.enabled !== false ? 'active' : 'disabled',
-          });
-        } catch { /* skip bad json */ }
-      }
-    }
-  } catch { /* dir may not exist */ }
-  return jobs;
+function formatSchedule(schedule: any): string {
+  if (!schedule) return 'unknown';
+  if (schedule.kind === 'cron') {
+    return `${schedule.expr}${schedule.tz ? ` (${schedule.tz})` : ''}`;
+  }
+  if (schedule.kind === 'every') {
+    const ms = schedule.everyMs;
+    if (ms >= 86400000) return `every ${Math.round(ms / 86400000)}d`;
+    if (ms >= 3600000) return `every ${Math.round(ms / 3600000)}h`;
+    if (ms >= 60000) return `every ${Math.round(ms / 60000)}min`;
+    return `every ${ms}ms`;
+  }
+  if (schedule.kind === 'at') {
+    return `once at ${new Date(schedule.at).toLocaleString()}`;
+  }
+  return JSON.stringify(schedule);
 }
 
 export const GET: APIRoute = async () => {
   try {
-    // Try gateway API first
-    try {
-      const data = await gatewayJSON<any>('/api/cron/jobs');
-      if (Array.isArray(data)) {
-        return new Response(JSON.stringify(data), {
-          headers: { 'Content-Type': 'application/json' },
-        });
-      }
-      if (data?.jobs) {
-        return new Response(JSON.stringify(data.jobs), {
-          headers: { 'Content-Type': 'application/json' },
-        });
-      }
-    } catch { /* gateway offline, fallback */ }
+    const data = await toolInvoke<any>('cron', {
+      action: 'list',
+      includeDisabled: true,
+    });
 
-    // Fallback: read cron files
-    const jobs = await getCronJobsFromFiles();
+    const rawJobs = data?.jobs || data || [];
+    const jobs = rawJobs.map((j: any) => {
+      const state = j.state || {};
+      const lastStatus = state.lastStatus || null;
+      const hasErrors = state.consecutiveErrors > 0;
+
+      return {
+        id: j.id || j.jobId,
+        name: j.name || j.label || 'Unnamed',
+        schedule: formatSchedule(j.schedule),
+        scheduleRaw: j.schedule,
+        enabled: j.enabled !== false,
+        status: !j.enabled ? 'disabled' : hasErrors ? 'error' : lastStatus === 'ok' ? 'active' : 'active',
+        lastRun: state.lastRunAtMs ? new Date(state.lastRunAtMs).toISOString() : null,
+        nextRun: state.nextRunAtMs ? new Date(state.nextRunAtMs).toISOString() : null,
+        lastStatus: lastStatus,
+        lastDurationMs: state.lastDurationMs || null,
+        lastError: state.lastError || null,
+        consecutiveErrors: state.consecutiveErrors || 0,
+        payload: j.payload || null,
+        delivery: j.delivery || null,
+        sessionTarget: j.sessionTarget || null,
+        model: j.payload?.model || null,
+        agentId: j.agentId || null,
+      };
+    });
+
     return new Response(JSON.stringify(jobs), {
       headers: { 'Content-Type': 'application/json' },
     });
@@ -72,15 +74,31 @@ export const POST: APIRoute = async ({ request }) => {
     const { action, id } = body;
 
     if (action === 'toggle') {
-      const res = await gatewayJSON<any>(`/api/cron/jobs/${id}/toggle`, { method: 'POST' });
-      return new Response(JSON.stringify(res), {
+      // Get current job to check enabled state
+      const listData = await toolInvoke<any>('cron', {
+        action: 'list',
+        includeDisabled: true,
+      });
+      const jobs = listData?.jobs || listData || [];
+      const job = jobs.find((j: any) => (j.id || j.jobId) === id);
+      const currentEnabled = job?.enabled !== false;
+
+      const res = await toolInvoke<any>('cron', {
+        action: 'update',
+        jobId: id,
+        patch: { enabled: !currentEnabled },
+      });
+      return new Response(JSON.stringify({ ok: true, enabled: !currentEnabled }), {
         headers: { 'Content-Type': 'application/json' },
       });
     }
 
     if (action === 'trigger') {
-      const res = await gatewayJSON<any>(`/api/cron/jobs/${id}/run`, { method: 'POST' });
-      return new Response(JSON.stringify(res), {
+      const res = await toolInvoke<any>('cron', {
+        action: 'run',
+        jobId: id,
+      });
+      return new Response(JSON.stringify({ ok: true }), {
         headers: { 'Content-Type': 'application/json' },
       });
     }

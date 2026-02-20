@@ -13,60 +13,60 @@ module.exports = {
         mono: ['"JetBrains Mono"', 'Consolas', 'monospace'],
       },
       colors: {
-        // Brand — Indigo
+        // Brand — Sunset Coral (Rose)
         brand: {
-          50: '#eef2ff',
-          100: '#e0e7ff',
-          200: '#c7d2fe',
-          300: '#a5b4fc',
-          400: '#818cf8',
-          500: '#6366f1', // Primary Indigo
-          600: '#4f46e5',
-          700: '#4338ca',
-          800: '#3730a3',
-          900: '#312e81',
-          950: '#1e1b4b',
+          50: '#fff1f2',
+          100: '#ffe4e6',
+          200: '#fecdd3',
+          300: '#fda4af',
+          400: '#fb7185',
+          500: '#f43f5e', // Primary Rose/Coral
+          600: '#e11d48',
+          700: '#be123c',
+          800: '#9f1239',
+          900: '#881337',
+          950: '#4c0519',
         },
-        // Accent — Cyan
+        // Accent — Amber Sun
         accent: {
-          50: '#ecfeff',
-          100: '#cffafe',
-          200: '#a5f3fc',
-          300: '#67e8f9',
-          400: '#22d3ee',
-          500: '#06b6d4', // Primary Accent
-          600: '#0891b2',
-          700: '#0e7490',
-          800: '#155e75',
-          900: '#164e63',
-          950: '#083344',
+          50: '#fffbeb',
+          100: '#fef3c7',
+          200: '#fde68a',
+          300: '#fcd34d',
+          400: '#fbbf24',
+          500: '#f59e0b', // Primary Amber
+          600: '#d97706',
+          700: '#b45309',
+          800: '#92400e',
+          900: '#78350f',
+          950: '#451a03',
         },
-        // Neutrals — Midnight Slate
+        // Neutrals — Warm Stone
         surface: {
-          50: '#f8fafc',
-          100: '#f1f5f9',
-          200: '#e2e8f0',
-          300: '#cbd5e1',
-          400: '#94a3b8',
-          500: '#64748b',
-          600: '#475569',
-          700: '#334155',
-          800: '#1e293b',
-          900: '#0f172a', // Card background
-          950: '#0f1117', // Page background
+          50: '#fafaf9',
+          100: '#f5f5f4',
+          200: '#e7e5e4',
+          300: '#d6d3d1',
+          400: '#a8a29e',
+          500: '#78716c',
+          600: '#57534e',
+          700: '#44403c',
+          800: '#292524',
+          900: '#1c1917', // Card background
+          950: '#0c0a09', // Page background
         },
       },
       backgroundImage: {
-        'gradient-page': 'radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.06) 0, transparent 50%), radial-gradient(at 100% 80%, rgba(6, 182, 212, 0.04) 0, transparent 50%)',
-        'gradient-brand': 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-        'gradient-accent': 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
+        'gradient-page': 'radial-gradient(at 0% 0%, rgba(244, 63, 94, 0.08) 0, transparent 50%), radial-gradient(at 100% 80%, rgba(245, 158, 11, 0.06) 0, transparent 50%)',
+        'gradient-brand': 'linear-gradient(135deg, #f43f5e 0%, #e11d48 100%)',
+        'gradient-accent': 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
       },
       boxShadow: {
-        card: '0 4px 20px rgba(15, 17, 23, 0.5), 0 0 0 1px rgba(99, 102, 241, 0.05)',
-        'card-hover': '0 8px 32px rgba(15, 17, 23, 0.6), 0 0 0 1px rgba(99, 102, 241, 0.1)',
-        'glow-brand': '0 0 20px rgba(99, 102, 241, 0.15), 0 0 6px rgba(99, 102, 241, 0.1)',
-        'glow-accent': '0 0 20px rgba(6, 182, 212, 0.15), 0 0 6px rgba(6, 182, 212, 0.1)',
-        'glow-emerald': '0 0 12px rgba(16, 185, 129, 0.1)',
+        card: '0 12px 40px -8px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05)',
+        'card-hover': '0 20px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(244, 63, 94, 0.2)',
+        'glow-brand': '0 0 20px rgba(244, 63, 94, 0.25), 0 0 6px rgba(244, 63, 94, 0.2)',
+        'glow-accent': '0 0 20px rgba(245, 158, 11, 0.25), 0 0 6px rgba(245, 158, 11, 0.2)',
+        'glow-emerald': '0 0 12px rgba(16, 185, 129, 0.2)',
       },
       borderRadius: {
         none: '0',

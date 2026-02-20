@@ -3,7 +3,12 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { clsx } from 'clsx';
-import { ChevronLeft, ChevronRight, Calendar, Clock } from 'lucide-react';
+import {
+  CustomChevronLeft,
+  CustomChevronRight,
+  CustomCalendar,
+  CustomClock
+} from './common/CustomIcons';
 import GlassCard from './common/GlassCard';
 
 interface CronJob {
@@ -101,10 +106,10 @@ export default function CalendarView() {
             >Week</button>
           </div>
           <button onClick={prevMonth} className="p-1.5 rounded-lg hover:bg-surface-800/50 text-surface-400 hover:text-surface-200">
-            <ChevronLeft className="w-4 h-4" />
+            <CustomChevronLeft className="w-4 h-4" />
           </button>
           <button onClick={nextMonth} className="p-1.5 rounded-lg hover:bg-surface-800/50 text-surface-400 hover:text-surface-200">
-            <ChevronRight className="w-4 h-4" />
+            <CustomChevronRight className="w-4 h-4" />
           </button>
         </div>
       </div>
@@ -186,7 +191,7 @@ export default function CalendarView() {
               </div>
             ) : (
               <div className="flex items-center justify-center h-32">
-                <Calendar className="w-8 h-8 text-surface-700" />
+                <CustomCalendar className="w-8 h-8 text-surface-700" />
               </div>
             )}
           </GlassCard>

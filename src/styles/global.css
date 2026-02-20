@@ -1,5 +1,5 @@
-/* OpenClaw CRM — "Arctic Indigo" design system */
-/* Midnight slate surfaces, indigo brand, cyan accents */
+/* OpenClaw CRM — "Sunset Coral" design system */
+/* Warm stone surfaces, rose brand, amber accents */
 
 @tailwind base;
 @tailwind components;
@@ -22,10 +22,10 @@
 
   body {
     @apply text-surface-200 font-sans min-h-screen relative overflow-x-hidden;
-    background-color: #0f1117;
+    background-color: #0c0a09;
     background-image:
-      radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.06) 0, transparent 50%),
-      radial-gradient(at 100% 80%, rgba(6, 182, 212, 0.04) 0, transparent 50%);
+      radial-gradient(at 0% 0%, rgba(244, 63, 94, 0.12) 0, transparent 50%),
+      radial-gradient(at 100% 80%, rgba(245, 158, 11, 0.10) 0, transparent 50%);
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   }
 
@@ -45,8 +45,8 @@
 
   /* Scrollbar — ultra minimal & themed */
   ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
   }
 
   ::-webkit-scrollbar-track {
@@ -54,12 +54,12 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-surface-800 rounded-full border-2 border-transparent bg-clip-padding;
-    transition: all 0.2s;
+    @apply bg-surface-700/50 rounded-full border-2 border-transparent bg-clip-padding;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-brand-500/30;
+    @apply bg-brand-500/50;
   }
 }
 
@@ -70,17 +70,35 @@
   /* ── Glass Card ────────────────────────────────────────────── */
 
   .glass-card {
-    background: rgba(15, 23, 42, 0.7);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(99, 102, 241, 0.08);
-    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(41, 37, 36, 0.45) 0%, rgba(28, 25, 23, 0.65) 100%);
+    backdrop-filter: blur(28px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    position: relative;
+    overflow: hidden;
+    box-shadow:
+      0 12px 40px -12px rgba(0, 0, 0, 0.6),
+      inset 0 1px 0 rgba(255, 255, 255, 0.02);
+  }
+
+  /* Subtitle glass shine */
+  .glass-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, transparent 50%);
+    pointer-events: none;
   }
 
   .glass-card-hover:hover {
-    border-color: rgba(99, 102, 241, 0.15);
-    background: rgba(15, 23, 42, 0.85);
-    transform: translateY(-1px);
-    box-shadow: 0 8px 32px rgba(15, 17, 23, 0.4);
+    border-color: rgba(244, 63, 94, 0.3);
+    background: rgba(45, 45, 45, 0.9);
+    transform: translateY(-2px);
+    box-shadow:
+      0 20px 40px -12px rgba(0, 0, 0, 0.7),
+      0 0 0 1px rgba(244, 63, 94, 0.15);
   }
 
   /* ── Buttons ───────────────────────────────────────────────── */
@@ -157,12 +175,11 @@
   .divider {
     @apply border-0 h-px w-full;
     background: linear-gradient(90deg,
-      transparent,
-      rgba(99, 102, 241, 0.15) 20%,
-      rgba(6, 182, 212, 0.10) 50%,
-      rgba(99, 102, 241, 0.15) 80%,
-      transparent
-    );
+        transparent,
+        rgba(244, 63, 94, 0.15) 20%,
+        rgba(245, 158, 11, 0.10) 50%,
+        rgba(244, 63, 94, 0.15) 80%,
+        transparent);
   }
 
   /* ── Stagger Animations ────────────────────────────────────── */
@@ -172,10 +189,21 @@
     @apply animate-fade-in-up;
   }
 
-  .animate-stagger-1 { animation-delay: 0ms; }
-  .animate-stagger-2 { animation-delay: 80ms; }
-  .animate-stagger-3 { animation-delay: 160ms; }
-  .animate-stagger-4 { animation-delay: 240ms; }
+  .animate-stagger-1 {
+    animation-delay: 0ms;
+  }
+
+  .animate-stagger-2 {
+    animation-delay: 80ms;
+  }
+
+  .animate-stagger-3 {
+    animation-delay: 160ms;
+  }
+
+  .animate-stagger-4 {
+    animation-delay: 240ms;
+  }
 
   /* ── Scrollbar Utilities ───────────────────────────────────── */
 
@@ -183,6 +211,7 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
@@ -191,12 +220,15 @@
     scrollbar-width: thin;
     scrollbar-color: rgba(30, 41, 59, 0.8) transparent;
   }
+
   .scrollbar-thin::-webkit-scrollbar {
     width: 4px;
   }
+
   .scrollbar-thin::-webkit-scrollbar-track {
     background: transparent;
   }
+
   .scrollbar-thin::-webkit-scrollbar-thumb {
     @apply bg-surface-800 rounded-full;
   }
@@ -218,6 +250,7 @@
       opacity: 0;
       transform: translateY(8px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
@@ -227,14 +260,12 @@
   /* ── Shimmer Text ──────────────────────────────────────────── */
 
   .shimmer-text {
-    background: linear-gradient(
-      90deg,
-      #818cf8 0%,
-      #818cf8 35%,
-      #ffffff 50%,
-      #818cf8 65%,
-      #818cf8 100%
-    );
+    background: linear-gradient(90deg,
+        #818cf8 0%,
+        #818cf8 35%,
+        #ffffff 50%,
+        #818cf8 65%,
+        #818cf8 100%);
     background-size: 200% 100%;
     -webkit-background-clip: text;
     background-clip: text;
@@ -243,8 +274,13 @@
   }
 
   @keyframes shimmerText {
-    0% { background-position: 100% 0; }
-    100% { background-position: -100% 0; }
+    0% {
+      background-position: 100% 0;
+    }
+
+    100% {
+      background-position: -100% 0;
+    }
   }
 
   /* ── Breathing Ring (active indicators) ────────────────────── */
@@ -252,6 +288,7 @@
   .breathing-ring {
     position: relative;
   }
+
   .breathing-ring::before {
     content: '';
     position: absolute;
@@ -262,8 +299,17 @@
   }
 
   @keyframes breathe {
-    0%, 100% { opacity: 0.3; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.03); }
+
+    0%,
+    100% {
+      opacity: 0.3;
+      transform: scale(1);
+    }
+
+    50% {
+      opacity: 1;
+      transform: scale(1.03);
+    }
   }
 
   /* ── Status Indicator ──────────────────────────────────────── */
@@ -271,17 +317,59 @@
   .status-dot {
     @apply w-2 h-2 rounded-full;
   }
+
   .status-dot-active {
     @apply status-dot bg-emerald-500 shadow-sm shadow-emerald-500/30;
   }
+
   .status-dot-warning {
     @apply status-dot bg-amber-500 shadow-sm shadow-amber-500/30;
   }
+
   .status-dot-error {
     @apply status-dot bg-red-500 shadow-sm shadow-red-500/30;
   }
+
   .status-dot-disabled {
     @apply status-dot bg-surface-600;
+  }
+
+  /* ── Grand Claw Animations ────────────────────────────────────── */
+
+  @keyframes mighty-flex-left {
+
+    0%,
+    100% {
+      transform: rotate(0deg) scale(1);
+    }
+
+    50% {
+      transform: rotate(10deg) scale(1.05);
+    }
+  }
+
+  @keyframes mighty-flex-right {
+
+    0%,
+    100% {
+      transform: rotate(0deg) scale(1);
+    }
+
+    50% {
+      transform: rotate(-10deg) scale(1.05);
+    }
+  }
+
+  @keyframes mighty-float {
+
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-5px);
+    }
   }
 }
 

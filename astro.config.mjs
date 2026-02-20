@@ -7,5 +7,5 @@ export default defineConfig({
   integrations: [react(), tailwind()],
   output: 'server',
   adapter: node({ mode: 'standalone' }),
-  server: { port: 3000 },
+  server: { port: 3000, host: '0.0.0.0' },
 });

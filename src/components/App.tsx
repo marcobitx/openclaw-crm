@@ -89,20 +89,29 @@ export default function App() {
   }, [navigate]);
 
   return (
-    <div className="relative z-10 flex h-screen overflow-hidden">
-      {/* Left — Icon Sidebar */}
-      <IconSidebar currentView={state.view} onNavigate={navigate} />
+    <div className="relative z-10 flex h-screen overflow-hidden bg-[#0c0a09] p-3 font-sans">
+      {/* Truly Global Background Glows — positioned to cover the whole UI including Sidebar */}
+      <div className="absolute top-0 left-0 w-full h-full pointer-events-none -z-10 overflow-hidden">
+        <div className="absolute top-[-10%] left-[-5%] w-[60%] h-[70%] bg-brand-500/[0.15] blur-[140px] rounded-full" />
+        <div className="absolute bottom-[-10%] right-[-5%] w-[50%] h-[60%] bg-accent-500/[0.1] blur-[120px] rounded-full" />
+      </div>
 
-      {/* Center + Right — Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden min-w-0 mt-3 mr-3 mb-3 rounded-2xl border border-surface-700/20 bg-surface-900/50">
-        <TopBar currentView={state.view} onNavigate={navigate} />
+      {/* Unified Glass Shell — This is the only layer with blur/tint */}
+      <div className="flex-1 flex overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.02] backdrop-blur-[32px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.7)] relative">
+        {/* Sidebar (Integrated & Truly Transparent) */}
+        <IconSidebar currentView={state.view} onNavigate={navigate} />
 
-        <div className="flex-1 flex overflow-hidden min-h-0">
-          <main className="flex-1 overflow-y-auto scrollbar-thin">
-            <div key={state.view} className="px-4 py-4 sm:px-6 sm:py-6 md:px-8 md:py-6 view-enter">
-              {renderView()}
-            </div>
-          </main>
+        {/* Main Content area (Integrated & Truly Transparent) */}
+        <div className="flex-1 flex flex-col overflow-hidden min-w-0 border-l border-white/[0.05] relative">
+          <TopBar currentView={state.view} onNavigate={navigate} />
+
+          <div className="flex-1 flex overflow-hidden min-h-0 relative z-10">
+            <main className="flex-1 overflow-y-auto scrollbar-thin">
+              <div key={state.view} className="px-4 py-4 sm:px-6 sm:py-6 md:px-8 md:py-6 view-enter">
+                {renderView()}
+              </div>
+            </main>
+          </div>
         </div>
       </div>
     </div>

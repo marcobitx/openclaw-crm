@@ -3,7 +3,11 @@
 
 import { useEffect, useState } from 'react';
 import { clsx } from 'clsx';
-import { Brain, Search, X, ExternalLink } from 'lucide-react';
+import {
+  CustomSkills,
+  CustomSearch,
+  CustomX
+} from './common/CustomIcons';
 import GlassCard from './common/GlassCard';
 import MarkdownRenderer from './common/MarkdownRenderer';
 
@@ -79,7 +83,7 @@ export default function SkillsView() {
         {/* Search + Filter */}
         <div className="flex items-center gap-3 mb-4">
           <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-surface-500" />
+            <CustomSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-surface-500" />
             <input
               type="text"
               value={search}
@@ -125,7 +129,7 @@ export default function SkillsView() {
               >
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <Brain className="w-4 h-4 text-brand-400" />
+                    <CustomSkills className="w-4 h-4 text-brand-400" />
                     <h4 className="text-[13px] font-bold text-surface-100 truncate">{skill.name}</h4>
                   </div>
                   <span className={clsx('px-2 py-0.5 rounded-md text-[10px] font-semibold border', catStyle.badge)}>
@@ -148,7 +152,7 @@ export default function SkillsView() {
             <div className="flex items-center justify-between px-4 py-3 border-b border-surface-700/20">
               <h3 className="text-[14px] font-bold text-surface-100">{selectedSkill}</h3>
               <button onClick={() => setSelectedSkill(null)} className="p-1 rounded-lg hover:bg-surface-800/50 text-surface-400 hover:text-surface-200">
-                <X className="w-4 h-4" />
+                <CustomX className="w-4 h-4" />
               </button>
             </div>
             <div className="p-4">
