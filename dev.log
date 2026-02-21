@@ -1,0 +1,11 @@
+[2m13:44:25[22m [34m[@astrojs/node][39m Enabling sessions with filesystem storage
+[2m13:44:25[22m [34m[types][39m Generated [2m2ms[22m
+[2m13:44:25[22m [34m[content][39m Syncing content
+[2m13:44:25[22m [34m[content][39m Synced content
+
+[42m[1m astro [22m[49m [32mv5.17.3[39m [2mready in[22m 1159 [2mms[22m
+
+[2m┃[22m Local    [36mhttp://localhost:3000/[39m
+[2m┃[22m Network  [36mhttp://192.168.1.94:3000/[39m
+
+[2m13:44:25[22m [32mwatching for file changes...[39m

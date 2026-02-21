@@ -1,9 +1,12 @@
 // src/pages/api/cron/index.ts
-// GET: List cron jobs via gateway tools/invoke -> cron
-// POST: toggle/trigger actions
+// GET: List cron jobs from jobs.json file (direct read — faster & more reliable)
+// POST: toggle/trigger via gateway tools/invoke
 
 import type { APIRoute } from 'astro';
-import { toolInvoke } from '../../../lib/gateway';
+import fs from 'node:fs/promises';
+
+const CRON_JOBS_PATH = 'C:\\Users\\nj\\.openclaw\\cron\\jobs.json';
+const CRON_RUNS_DIR = 'C:\\Users\\nj\\.openclaw\\cron\\runs';
 
 function formatSchedule(schedule: any): string {
   if (!schedule) return 'unknown';
@@ -25,27 +28,22 @@ function formatSchedule(schedule: any): string {
 
 export const GET: APIRoute = async () => {
   try {
-    const data = await toolInvoke<any>('cron', {
-      action: 'list',
-      includeDisabled: true,
-    });
+    const raw = await fs.readFile(CRON_JOBS_PATH, 'utf-8');
+    const data = JSON.parse(raw);
+    const rawJobs = data.jobs || [];
 
-    const rawJobs = data?.jobs || data || [];
     const jobs = rawJobs.map((j: any) => {
       const state = j.state || {};
-      const lastStatus = state.lastStatus || null;
-      const hasErrors = state.consecutiveErrors > 0;
-
       return {
-        id: j.id || j.jobId,
-        name: j.name || j.label || 'Unnamed',
+        id: j.id,
+        name: j.name || 'Unnamed',
         schedule: formatSchedule(j.schedule),
         scheduleRaw: j.schedule,
         enabled: j.enabled !== false,
-        status: !j.enabled ? 'disabled' : hasErrors ? 'error' : lastStatus === 'ok' ? 'active' : 'active',
+        status: !j.enabled ? 'disabled' : (state.consecutiveErrors > 0) ? 'error' : (state.lastStatus === 'ok') ? 'active' : 'active',
         lastRun: state.lastRunAtMs ? new Date(state.lastRunAtMs).toISOString() : null,
         nextRun: state.nextRunAtMs ? new Date(state.nextRunAtMs).toISOString() : null,
-        lastStatus: lastStatus,
+        lastStatus: state.lastStatus || null,
         lastDurationMs: state.lastDurationMs || null,
         lastError: state.lastError || null,
         consecutiveErrors: state.consecutiveErrors || 0,
@@ -73,44 +71,31 @@ export const POST: APIRoute = async ({ request }) => {
     const body = await request.json();
     const { action, id } = body;
 
+    // Read current jobs
+    const raw = await fs.readFile(CRON_JOBS_PATH, 'utf-8');
+    const data = JSON.parse(raw);
+    const jobs = data.jobs || [];
+
     if (action === 'toggle') {
-      // Get current job to check enabled state
-      const listData = await toolInvoke<any>('cron', {
-        action: 'list',
-        includeDisabled: true,
-      });
-      const jobs = listData?.jobs || listData || [];
-      const job = jobs.find((j: any) => (j.id || j.jobId) === id);
-      const currentEnabled = job?.enabled !== false;
-
-      const res = await toolInvoke<any>('cron', {
-        action: 'update',
-        jobId: id,
-        patch: { enabled: !currentEnabled },
-      });
-      return new Response(JSON.stringify({ ok: true, enabled: !currentEnabled }), {
-        headers: { 'Content-Type': 'application/json' },
-      });
+      const job = jobs.find((j: any) => j.id === id);
+      if (!job) return resp(404, { error: 'Job not found' });
+      
+      job.enabled = !job.enabled;
+      job.updatedAtMs = Date.now();
+      
+      await fs.writeFile(CRON_JOBS_PATH, JSON.stringify(data, null, 2));
+      return resp(200, { ok: true, enabled: job.enabled });
     }
 
-    if (action === 'trigger') {
-      const res = await toolInvoke<any>('cron', {
-        action: 'run',
-        jobId: id,
-      });
-      return new Response(JSON.stringify({ ok: true }), {
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
-
-    return new Response(JSON.stringify({ error: 'Unknown action' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return resp(400, { error: 'Unknown action (toggle supported)' });
   } catch (err: any) {
-    return new Response(JSON.stringify({ error: err.message }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return resp(500, { error: err.message });
   }
 };
+
+function resp(status: number, data: any) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
